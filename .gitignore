@@ -1,0 +1,22 @@
+# Signing keys - never commit
+platform.pk8
+platform.x509.pem
+
+# Unsigned/intermediate APKs
+Launcher_patched.apk
+Radio_patched.apk
+
+# Original system APKs (too large)
+originals/
+
+# Full decompiled smali trees (too large - use patches/ instead)
+Launcher_smali/
+Radio_smali/
+
+# Tools
+apktool.jar
+*.jar
+jadx/
+
+# Misc
+*.tmp

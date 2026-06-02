@@ -1470,6 +1470,20 @@
     # PATCH: forward DAB slideshow bitmap to RadioMBService -> MediaSession ALBUM_ART
     # v0 = mRadioStorage (valid from setDabSlideShow call above), p1 = Bitmap
 
+    # CENTER-CROP: remove horizontal black bars so launcher always gets a square
+    # Radio app already received the original p1 above; we only crop for MediaSession/cache
+    invoke-virtual {p1}, Landroid/graphics/Bitmap;->getWidth()I
+    move-result v1
+    invoke-virtual {p1}, Landroid/graphics/Bitmap;->getHeight()I
+    move-result v2
+    if-le v1, v2, :no_crop
+    sub-int/2addr v1, v2
+    div-int/lit8 v1, v1, 0x2
+    const/4 v3, 0x0
+    invoke-static {p1, v1, v3, v2, v2}, Landroid/graphics/Bitmap;->createBitmap(Landroid/graphics/Bitmap;IIII)Landroid/graphics/Bitmap;
+    move-result-object p1
+    :no_crop
+
     invoke-virtual {v0}, Lcom/saicmotor/radio/model/RadioStorage;->getCurrentDabStation()Lcom/android/car/radio/service/RadioDabStation;
     move-result-object v0
 

@@ -1113,7 +1113,73 @@
     .line 2496
     monitor-exit v0
 
+    # CACHE LOAD: restore cached bitmap for this station immediately on tune
+    # p1 = resolved station (may be null), v5/v6 = serviceId (long wide pair)
+    # v0-v4, v7-v11 free at this point
+    if-eqz p1, :cache_skip
+
+    new-instance v7, Ljava/lang/StringBuilder;
+    invoke-direct {v7}, Ljava/lang/StringBuilder;-><init>()V
+    const-string v8, "dab_"
+    invoke-virtual {v7, v8}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    invoke-virtual {v7, v5, v6}, Ljava/lang/StringBuilder;->append(J)Ljava/lang/StringBuilder;
+    const-string v8, ".jpg"
+    invoke-virtual {v7, v8}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    invoke-virtual {v7}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+    move-result-object v7
+
+    iget-object v8, p0, Lcom/saicmotor/radio/service/RadioService$DabTunerCallback;->this$0:Lcom/saicmotor/radio/service/RadioService;
+
+    :cache_load_try_start
+    invoke-virtual {v8, v7}, Landroid/content/Context;->openFileInput(Ljava/lang/String;)Ljava/io/FileInputStream;
+    move-result-object v9
+    invoke-static {v9}, Landroid/graphics/BitmapFactory;->decodeStream(Ljava/io/InputStream;)Landroid/graphics/Bitmap;
+    move-result-object v10
+    invoke-virtual {v9}, Ljava/io/FileInputStream;->close()V
+    :cache_load_try_end
+    .catch Ljava/lang/Exception; {:cache_load_try_start .. :cache_load_try_end} :cache_io_error
+
+    if-eqz v10, :cache_skip
+
+    iget-object v7, p0, Lcom/saicmotor/radio/service/RadioService$DabTunerCallback;->this$0:Lcom/saicmotor/radio/service/RadioService;
+    invoke-static {v7}, Lcom/saicmotor/radio/service/RadioService;->access$1900(Lcom/saicmotor/radio/service/RadioService;)Landroid/os/RemoteCallbackList;
+    move-result-object v7
+
+    monitor-enter v7
+
+    invoke-virtual {v7}, Landroid/os/RemoteCallbackList;->beginBroadcast()I
+    move-result v11
+    const/4 v2, 0x0
+
+    :cache_mbs_loop
+    if-ge v2, v11, :cache_mbs_done
+
+    :cache_mbs_item_try_start
+    invoke-virtual {v7, v2}, Landroid/os/RemoteCallbackList;->getBroadcastItem(I)Landroid/os/IInterface;
+    move-result-object v8
+    check-cast v8, Lcom/android/car/radio/service/IRadioMBSCallback;
+    invoke-interface {v8, p1, v10}, Lcom/android/car/radio/service/IRadioMBSCallback;->setSessionMetadataDabBitmap(Lcom/android/car/radio/service/RadioDabStation;Landroid/graphics/Bitmap;)V
+    :cache_mbs_item_try_end
+    .catch Ljava/lang/Exception; {:cache_mbs_item_try_start .. :cache_mbs_item_try_end} :cache_mbs_item_catch
+
+    :cache_mbs_next
+    add-int/lit8 v2, v2, 0x1
+    goto :cache_mbs_loop
+
+    :cache_mbs_item_catch
+    move-exception v8
+    goto :cache_mbs_next
+
+    :cache_mbs_done
+    invoke-virtual {v7}, Landroid/os/RemoteCallbackList;->finishBroadcast()V
+    monitor-exit v7
+
+    :cache_skip
     goto :goto_2
+
+    :cache_io_error
+    move-exception v7
+    goto :cache_skip
 
     :catchall_0
     move-exception p1
@@ -1358,7 +1424,7 @@
 .end method
 
 .method public onDabSlideShowChanged(Landroid/graphics/Bitmap;)V
-    .locals 5
+    .locals 7
 
     .line 2566
     invoke-static {}, Lcom/saicmotor/radio/service/RadioService;->access$200()Lcom/saicmotor/radio/utils/log/Logger;
@@ -1448,6 +1514,39 @@
     :patch_mbs_done
     invoke-virtual {v1}, Landroid/os/RemoteCallbackList;->finishBroadcast()V
     monitor-exit v1
+
+    # CACHE SAVE: persist slideshow bitmap to disk keyed by station serviceId
+    # v0 = current DAB station (non-null), p1 = Bitmap (non-null), v1-v6 free
+    iget-object v1, p0, Lcom/saicmotor/radio/service/RadioService$DabTunerCallback;->this$0:Lcom/saicmotor/radio/service/RadioService;
+
+    invoke-virtual {v0}, Lcom/android/car/radio/service/RadioDabStation;->getServiceId()J
+    move-result-wide v2
+
+    new-instance v4, Ljava/lang/StringBuilder;
+    invoke-direct {v4}, Ljava/lang/StringBuilder;-><init>()V
+    const-string v5, "dab_"
+    invoke-virtual {v4, v5}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    invoke-virtual {v4, v2, v3}, Ljava/lang/StringBuilder;->append(J)Ljava/lang/StringBuilder;
+    const-string v5, ".jpg"
+    invoke-virtual {v4, v5}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    invoke-virtual {v4}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+    move-result-object v4
+
+    :patch_save_try_start
+    const/4 v5, 0x0
+    invoke-virtual {v1, v4, v5}, Landroid/content/Context;->openFileOutput(Ljava/lang/String;I)Ljava/io/FileOutputStream;
+    move-result-object v5
+    sget-object v6, Landroid/graphics/Bitmap$CompressFormat;->JPEG:Landroid/graphics/Bitmap$CompressFormat;
+    const/16 v4, 0x55
+    invoke-virtual {p1, v6, v4, v5}, Landroid/graphics/Bitmap;->compress(Landroid/graphics/Bitmap$CompressFormat;ILjava/io/OutputStream;)Z
+    invoke-virtual {v5}, Ljava/io/FileOutputStream;->close()V
+    :patch_save_try_end
+    .catch Ljava/lang/Exception; {:patch_save_try_start .. :patch_save_try_end} :patch_save_error
+
+    goto :patch_skip
+
+    :patch_save_error
+    move-exception v4
 
     :patch_skip
     goto :goto_0

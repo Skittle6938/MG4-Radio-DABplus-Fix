@@ -29,6 +29,8 @@ adb push apk/Radio_patched_signed.apk /data/local/tmp/radio_patch.apk
 adb shell pm install -f /data/local/tmp/radio_patch.apk
 ```
 
+**A reboot may be required after installation.** To reboot the head unit, hold the Home button for approximately 20 seconds until the screen goes off and the unit restarts.
+
 ## Reverting
 
 ```bash

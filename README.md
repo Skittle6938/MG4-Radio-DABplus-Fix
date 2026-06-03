@@ -10,6 +10,8 @@ Patch for the SAIC MG4 (EH32 LL firmware) head unit that fixes missing DAB+ stat
 
 ## What this fixes
 
+### DAB+ slideshow art on the launcher
+
 On the stock MG4 head unit, when you listen to a DAB+ station that broadcasts artwork (station logo, album cover, show image…), the image appears correctly **inside the radio app** — but the launcher home screen always shows a generic placeholder instead of the actual artwork.
 
 After this patch, **the artwork appears directly on the launcher home screen**, along with the station name and current song title, without having to open the radio app.
@@ -24,6 +26,17 @@ This patch also **remembers the last image received for each station** and resto
 
 Some stations broadcast rectangular images with black bars on the sides (e.g. France Info). The patch automatically center-crops these to a clean square before sending them to the launcher, so images always fit the launcher widget correctly without distortion.
 
+### Auto-play radio on power-on
+
+On the stock head unit, the radio does not automatically resume playback when the car is powered on — it only does so if the radio was the last active audio source. If you were using Bluetooth or CarPlay before parking, silence greets you on the next start.
+
+This patch **automatically starts radio playback every time the car powers on**, regardless of what was playing before. The feature is enabled by default and can be toggled at any time inside the app:
+
+> **Radio app → ⋮ Menu → RDS Settings → DAB Service Following** (switch repurposed as the auto-play toggle)
+
+When the switch is **on** (default): radio resumes automatically ~300 ms after ACC-on, using the same band and station that was last active.  
+When the switch is **off**: behaviour is identical to the stock app — no auto-resume.
+
 ---
 
 ## How it works (technical)
@@ -35,8 +48,10 @@ The stock radio app receives slideshow bitmaps via `onDabSlideShowChanged()` in 
 - Per-station disk cache (`dab_<serviceId>.jpg`) — saved on receive, restored on tune
 - Center-crop of landscape images to square before sending to launcher/cache
 - Proper synchronization (`synchronized(mMBSCallbacks)`) and null-guards matching the existing code patterns
+- Auto-play on ACC-on: hooks into `handleAccOffStatus()` and `lambda$onCreate$0$RadioService()` to schedule playback resume via the existing `RadioService$4` (FM/AM) and `RadioService$5` (DAB) Runnables
+- UI toggle: repurposes the `DAB Service Following` switch in the RDS Settings dialog to read/write the `auto_play_on_start` SharedPreferences key
 
-Only `RadioService$DabTunerCallback.smali` is modified. The launcher APK is untouched.
+Modified files: `RadioService$DabTunerCallback.smali`, `RadioService.smali`, `RadioRDSSettingsDialog.smali`. The launcher APK is untouched.
 
 ---
 

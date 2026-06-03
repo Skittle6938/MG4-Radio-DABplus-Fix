@@ -1,24 +1,44 @@
-# MG4 Radio Fixed — DAB+ Slideshow Art on Launcher
+# MG4 Radio — DAB+ Slideshow Art on Launcher
 
-Patch for the SAIC MG4 (EH32 LL firmware) head unit that fixes missing DAB+ slideshow art on the stock launcher home screen.
+Patch for the SAIC MG4 (EH32 LL firmware) head unit that fixes missing DAB+ station artwork on the stock launcher home screen.
+
+![DAB+ artwork displayed on the MG4 launcher home screen](screenshots/launcher-with-artwork.jpg)
+
+*Virgin Radio artwork displayed live on the launcher home screen — song title included.*
+
+---
 
 ## What this fixes
 
-On the stock MG4 head unit, the DAB+ radio app displays slideshow images (album art, show logos, etc.) inside the radio app itself — but these images never appear on the launcher home screen, which only shows the default placeholder icon.
+On the stock MG4 head unit, when you listen to a DAB+ station that broadcasts artwork (station logo, album cover, show image…), the image appears correctly **inside the radio app** — but the launcher home screen always shows a generic placeholder instead of the actual artwork.
 
-**Root cause:** `onDabSlideShowChanged()` in `RadioService$DabTunerCallback` forwarded the bitmap to the radio app's own UI but never published it to the Android `MediaSession` (`ALBUM_ART` metadata key). The launcher reads from `MediaSession` — so it never received the image.
+After this patch, **the artwork appears directly on the launcher home screen**, along with the station name and current song title, without having to open the radio app.
 
-## Patch — Radio APK only
+### Bonus: instant artwork on station switch
 
-**File:** `patches/radio/smali/com/saicmotor/radio/service/RadioService$DabTunerCallback.smali`  
-**Method:** `onDabSlideShowChanged(Landroid/graphics/Bitmap;)V`
+DAB+ stations only broadcast their slideshow image every 10–30 seconds. Without caching, you'd have to wait up to half a minute each time you switch stations for the image to appear on the launcher.
 
-Added after `setDabSlideShow(bitmap)`:
-- Null-check on `getCurrentDabStation()` — avoids wiping MediaSession metadata on null station
-- `synchronized(mRadioMBSCallbacks)` block — matches existing locking pattern
-- Loop over `IRadioMBSCallback` listeners calling `setSessionMetadataDabBitmap(station, bitmap)`
-- Per-iteration `try/catch` — one bad callback can't break the loop
-- `catchall` handler — guarantees `monitor-exit` on unexpected throw
+This patch also **remembers the last image received for each station** and restores it immediately the next time you tune to that station, so the artwork is visible right away.
+
+### Image cropping
+
+Some stations broadcast rectangular images with black bars on the sides (e.g. France Info). The patch automatically center-crops these to a clean square before sending them to the launcher, so images always fit the launcher widget correctly without distortion.
+
+---
+
+## How it works (technical)
+
+The stock radio app receives slideshow bitmaps via `onDabSlideShowChanged()` in `RadioService$DabTunerCallback` and forwards them to its own UI — but never publishes them to the Android `MediaSession` (`ALBUM_ART` metadata key). The launcher reads artwork exclusively from `MediaSession`, so it never received anything.
+
+**This patch (radio APK only) adds:**
+- Forward of each received bitmap to `MediaSession` via `IRadioMBSCallback.setSessionMetadataDabBitmap()`
+- Per-station disk cache (`dab_<serviceId>.jpg`) — saved on receive, restored on tune
+- Center-crop of landscape images to square before sending to launcher/cache
+- Proper synchronization (`synchronized(mMBSCallbacks)`) and null-guards matching the existing code patterns
+
+Only `RadioService$DabTunerCallback.smali` is modified. The launcher APK is untouched.
+
+---
 
 ## Installation
 
@@ -48,12 +68,16 @@ Once USB debugging is enabled:
 
 > **A reboot may be required after installation.** Hold the Home button for approximately 20 seconds until the screen turns off and the unit restarts.
 
+---
+
 ## Reverting
 
 ```bash
 adb shell pm uninstall com.saicmotor.radio
 ```
 The system original under `/system/priv-app/Radio_eh32_ll/` is restored automatically.
+
+---
 
 ## Firmware compatibility
 

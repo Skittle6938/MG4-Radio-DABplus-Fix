@@ -22,14 +22,31 @@ Added after `setDabSlideShow(bitmap)`:
 
 ## Installation
 
-Requires ADB access to the head unit.
+### Option A — Direct APK install (recommended)
 
-```bash
-adb push apk/Radio_patched_signed.apk /data/local/tmp/radio_patch.apk
-adb shell pm install -f /data/local/tmp/radio_patch.apk
-```
+1. Download **[Radio_patched_signed.apk](https://github.com/Skittle6938/MG4-Radio-DABplus-Fix/raw/main/apk/Radio_patched_signed.apk)**
+2. Copy it to a USB stick and plug it into the head unit's USB port
+3. Open the APK with the built-in file manager to install it
 
-**A reboot may be required after installation.** To reboot the head unit, hold the Home button for approximately 20 seconds until the screen goes off and the unit restarts.
+> **A reboot may be required after installation.** Hold the Home button for approximately 20 seconds until the screen turns off and the unit restarts.
+
+### Option B — ADB over USB
+
+ADB is disabled by default on the MG4 head unit. You need to enable it first using **ADB_util**, a tool developed by Leon Kerman:
+
+> [XDA thread — MG4 Electric AAOS 9 playing (and possibly other MG models)](https://xdaforums.com/t/mg4-electric-aaos-9-playing-and-possibly-other-mg-models.4697712/post-90591053)
+
+Once USB debugging is enabled:
+
+1. Connect a USB cable between your PC and the head unit
+2. Run:
+   ```bash
+   adb push Radio_patched_signed.apk /data/local/tmp/radio_patch.apk
+   adb shell pm install -f /data/local/tmp/radio_patch.apk
+   ```
+   The `-f` flag is required to replace the system app with the patched version.
+
+> **A reboot may be required after installation.** Hold the Home button for approximately 20 seconds until the screen turns off and the unit restarts.
 
 ## Reverting
 

@@ -3,6 +3,7 @@
 Patch for the SAIC MG4 (EH32 LL firmware) head unit that:
 1. Fixes missing **DAB+ station artwork** on the stock launcher home screen.
 2. Adds **automatic radio resume** when the car starts — the radio plays again on its own, without opening the app.
+3. Keeps **live metadata (artwork, text) flowing to the launcher even while paused**.
 
 ![DAB+ artwork displayed on the MG4 launcher home screen](screenshots/launcher-with-artwork.jpg)
 
@@ -36,6 +37,14 @@ If the radio was playing when you switched the car off, it now **starts playing 
 
 **How it works:** at boot the car asks the radio to load as the active media source but in a *muted / paused* state (this is the stock behaviour — it's why the station name shows on the launcher but no sound plays). The patch intercepts that moment and, when auto-resume is enabled and the radio was playing at shutdown, routes it through the radio's normal tune-and-play path instead, so audio actually starts.
 
+### 3. Live metadata while paused
+
+On the stock firmware, pausing the radio makes the launcher home screen **freeze or drop** the now-playing card — the artwork and text stop updating until you press play again.
+
+After this patch, when you pause the radio the **artwork, song/programme text (DAB+ DLS) and FM RDS text keep updating live on the launcher**, exactly as if it were playing. Only the audio is muted.
+
+**How it works:** pausing only mutes the audio — the tuner stays tuned and keeps decoding metadata. The stock code, however, called `MediaSession.setActive(false)` on pause, which removes the session from the system's *active* media session and stops the launcher from receiving further updates. The patch keeps the session **active** while paused (state still reported as `PAUSED`, so the play/pause button stays correct), so live metadata keeps reaching the launcher.
+
 ### Bonus: instant artwork on station switch
 
 DAB+ stations only broadcast their slideshow image every 10–30 seconds. Without caching, you'd have to wait up to half a minute each time you switch stations for the image to appear on the launcher.
@@ -65,6 +74,12 @@ The stock radio app receives slideshow bitmaps via `onDabSlideShowChanged()` in 
 At boot the car sends `RadioService.onStartCommand()` a "resume as source" command (event `0x8006`), which the stock code handles via `resumeOnlySource()` / `resumeDabOnlySource()` — these deliberately `mute(true)` and set the session to **PAUSED** (source loaded, silent). That is why the launcher shows the station name but nothing plays.
 
 **This adds:** a gate at the top of `resumeOnlySource()` / `resumeDabOnlySource()` — when the **Auto-resume** preference is ON **and** the radio was playing at shutdown, it instead calls the radio's existing `resumeTunerChannel()` / `resumeDabTunerChannel()` (full tune + `PLAYING` state) so audio actually starts. The preference and last-playing state are persisted in `RadioSharedPreference`; the on-screen toggle and play-state tracking live in the FM/DAB presenters and fragments.
+
+### Live metadata while paused
+
+Pausing routes through `RadioMBService.toSetSessionPlaybackStatePaused()`, which set the playback state to `STATE_PAUSED` **and** called `MediaSession.setActive(false)`. An inactive session is no longer the system's active media session, so the launcher stops receiving metadata/art updates even though the tuner is still decoding them (pause = `RadioTuner.setMute(true)` only — the tuner stays tuned).
+
+**This removes** the `setActive(false)` call on pause. The state is still reported as `STATE_PAUSED` (correct play/pause button, audio stays muted), but the session stays **active**, so the existing slideshow/DLS/RDS forwarding (which already runs with no play-state condition) keeps the launcher's artwork and text live.
 
 Everything is contained in the **radio APK** — the launcher APK is untouched. See [`patches/radio/`](patches/radio/) for the exact modified smali and resource files.
 

@@ -33,5 +33,5 @@
             <Button android:layout_gravity="center" android:id="@id/btn_dab_search_list" android:background="@drawable/radio_btn_search_list" android:layout_width="@dimen/dp_66" android:layout_height="@dimen/dp_66" android:layout_marginStart="@dimen/dp_68" />
         </LinearLayout>
     </LinearLayout>
-    <Button android:id="@id/btn_radio_autostart" android:background="@null" android:textColor="@color/color_selected" android:textSize="@dimen/sp_26" android:padding="@dimen/dp_14" android:text="@string/radio_autostart_on" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentBottom="true" android:layout_alignParentStart="true" android:layout_marginStart="@dimen/dp_36" android:layout_marginBottom="@dimen/dp_20" />
+    <Button android:id="@id/btn_radio_autostart" android:background="@null" android:textColor="@color/color_selected" android:textSize="@dimen/sp_26" android:padding="@dimen/dp_14" android:text="@string/radio_autostart_on" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentBottom="true" android:layout_alignParentStart="true" android:layout_marginStart="@dimen/dp_36" android:layout_marginBottom="@dimen/dp_10" />
 </RelativeLayout>

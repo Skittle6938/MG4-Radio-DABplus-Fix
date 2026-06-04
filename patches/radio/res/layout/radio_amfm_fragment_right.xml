@@ -26,5 +26,5 @@
         </LinearLayout>
     </RelativeLayout>
     <ImageButton android:id="@id/btn_dab_rds_setting" android:background="@null" android:layout_width="@dimen/dp_160" android:layout_height="@dimen/dp_120" android:layout_marginTop="@dimen/dp_30" android:src="@drawable/radio_btn_dab_setting" android:scaleType="centerInside" android:layout_marginStart="@dimen/dp_130" />
-    <Button android:id="@id/btn_radio_autostart" android:background="@null" android:textColor="@color/color_selected" android:textSize="@dimen/sp_26" android:padding="@dimen/dp_14" android:text="@string/radio_autostart_on" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentBottom="true" android:layout_alignParentEnd="true" android:layout_marginEnd="@dimen/dp_36" android:layout_marginBottom="@dimen/dp_20" />
+    <Button android:id="@id/btn_radio_autostart" android:background="@null" android:textColor="@color/color_selected" android:textSize="@dimen/sp_26" android:padding="@dimen/dp_14" android:text="@string/radio_autostart_on" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentBottom="true" android:layout_alignParentEnd="true" android:layout_marginEnd="@dimen/dp_36" android:layout_marginBottom="@dimen/dp_10" />
 </RelativeLayout>

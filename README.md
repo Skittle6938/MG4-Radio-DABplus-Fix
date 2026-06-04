@@ -35,6 +35,10 @@ If the radio was playing when you switched the car off, it now **starts playing 
 - If you **manually paused** the radio before switching off, it stays paused on the next start (your choice is respected).
 - Works for both **FM/AM** and **DAB+**.
 
+![Auto-resume toggle added to the DAB radio page](screenshots/auto-resume-toggle.jpg)
+
+*The "REPRISE AUTO : ON" toggle added at the bottom-left of the radio page.*
+
 **How it works:** at boot the car asks the radio to load as the active media source but in a *muted / paused* state (this is the stock behaviour — it's why the station name shows on the launcher but no sound plays). The patch intercepts that moment and, when auto-resume is enabled and the radio was playing at shutdown, routes it through the radio's normal tune-and-play path instead, so audio actually starts.
 
 ### 3. Live metadata while paused

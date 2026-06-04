@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:orientation="horizontal" android:id="@id/radio_band_view_container" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <Button android:id="@id/btn_dab_scan" android:background="@drawable/radio_btn_scan" android:visibility="gone" android:layout_width="@dimen/dp_90" android:layout_height="@dimen/dp_91" android:layout_marginTop="@dimen/dp_8" android:layout_marginStart="@dimen/dp_29" />
+    <ImageButton android:id="@id/btn_dab_rds_setting" android:background="@null" android:layout_width="@dimen/dp_156" android:layout_height="@dimen/dp_63" android:layout_marginTop="@dimen/dp_24" android:src="@drawable/radio_btn_dab_setting" android:scaleType="centerInside" android:layout_marginStart="@dimen/dp_60" />
+    <LinearLayout android:orientation="vertical" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@id/btn_dab_rds_setting" android:layout_centerHorizontal="true">
+        <LinearLayout android:orientation="horizontal" android:id="@id/ll_dab_info" android:layout_width="wrap_content" android:layout_height="wrap_content">
+            <RelativeLayout android:layout_width="@dimen/dp_287" android:layout_height="@dimen/dp_287">
+                <RelativeLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_8" android:layout_marginStart="@dimen/dp_29" android:layout_marginEnd="@dimen/dp_29">
+                    <ImageView android:id="@id/iv_radio_dab_cover" android:visibility="visible" android:layout_width="@dimen/dp_228" android:layout_height="@dimen/dp_228" android:scaleType="fitXY" />
+                    <com.saicmotor.radio.view.widget.bannerview.banner_view.BannerView android:id="@id/bv_slide_show" android:visibility="gone" android:layout_width="@dimen/dp_228" android:layout_height="@dimen/dp_228" android:layout_centerHorizontal="true" app:autoPlaying="true" app:interval="1500" />
+                    <Button android:id="@id/btn_radio_switch_logo_slideshow" android:visibility="visible" android:layout_width="@dimen/dp_90" android:layout_height="@dimen/dp_65" android:layout_marginTop="@dimen/dp_163" android:layout_marginStart="@dimen/dp_138" />
+                </RelativeLayout>
+            </RelativeLayout>
+            <LinearLayout android:orientation="vertical" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="@dimen/dp_72">
+                <LinearLayout android:orientation="horizontal" android:layout_width="wrap_content" android:layout_height="wrap_content">
+                    <TextView android:textSize="@dimen/sp_40" android:textColor="@color/color_selected" android:layout_gravity="center" android:id="@id/tv_dab_program_name" android:layout_width="@dimen/dp_397" android:layout_height="wrap_content" android:text="_" android:singleLine="true" android:includeFontPadding="false" />
+                    <Button android:textSize="@dimen/sp_22" android:textColor="@color/color_selected" android:id="@id/btn_dab_program" android:background="@drawable/radio_btn_program_guide" android:layout_width="@dimen/dp_169" android:layout_height="@dimen/dp_102" android:text="@string/radio_btn_program_list_text_EPG" android:textAllCaps="false" android:layout_marginStart="@dimen/dp_42" />
+                </LinearLayout>
+                <LinearLayout android:orientation="horizontal" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_3">
+                    <ImageView android:layout_gravity="center" android:id="@id/iv_radio_dab_type" android:background="@mipmap/icon_radio_dab_type_img" android:layout_width="@dimen/dp_31" android:layout_height="@dimen/dp_25" />
+                    <TextView android:textSize="@dimen/sp_32" android:textColor="@color/color_unselected" android:id="@id/tv_dab_radio_ensemble_name" android:layout_width="@dimen/dp_320" android:layout_height="wrap_content" android:text="_" android:singleLine="true" android:includeFontPadding="false" android:layout_marginStart="14.0dip" />
+                </LinearLayout>
+                <com.saicmotor.radio.view.widget.MarqueTextView android:textSize="@dimen/sp_30" android:textColor="@color/color_selected" android:ellipsize="marquee" android:id="@id/tv_dab_frequency_name" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_34" android:singleLine="true" android:includeFontPadding="false" android:lineSpacingExtra="0.0sp" android:marqueeRepeatLimit="marquee_forever" />
+            </LinearLayout>
+        </LinearLayout>
+        <LinearLayout android:layout_gravity="center" android:orientation="horizontal" android:id="@id/ll_dab_base_function" android:layout_width="wrap_content" android:layout_height="wrap_content">
+            <Button android:layout_gravity="center" android:id="@id/btn_dab_search_list" android:background="@drawable/radio_btn_search_list" android:layout_width="@dimen/dp_66" android:layout_height="@dimen/dp_66" />
+            <Button android:layout_gravity="center" android:id="@id/btn_dab_favorite_list" android:background="@drawable/radio_btn_collection_list" android:layout_width="@dimen/dp_66" android:layout_height="@dimen/dp_66" android:layout_marginStart="@dimen/dp_68" />
+            <Button android:layout_gravity="center" android:id="@id/btn_dab_previous" android:background="@drawable/radio_btn_previous" android:layout_width="@dimen/dp_66" android:layout_height="@dimen/dp_66" android:layout_marginStart="@dimen/dp_68" />
+            <ImageButton android:layout_gravity="center" android:id="@id/ib_dab_play_pause" android:background="#00ffffff" android:layout_width="@dimen/dp_120" android:layout_height="@dimen/dp_122" android:scaleType="center" android:layout_marginStart="@dimen/dp_68" />
+            <Button android:layout_gravity="center" android:id="@id/btn_dab_next" android:background="@drawable/radio_btn_backwards" android:layout_width="@dimen/dp_66" android:layout_height="@dimen/dp_66" android:layout_marginStart="@dimen/dp_68" />
+            <ImageButton android:layout_gravity="center" android:id="@id/ib_dab_favorite" android:background="#00ffffff" android:layout_width="@dimen/dp_66" android:layout_height="@dimen/dp_66" android:scaleType="center" android:layout_marginStart="@dimen/dp_68" />
+        </LinearLayout>
+    </LinearLayout>
+    <Button android:id="@id/btn_radio_autostart" android:background="@null" android:textColor="@color/color_selected" android:textSize="@dimen/sp_26" android:padding="@dimen/dp_14" android:text="@string/radio_autostart_on" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentBottom="true" android:layout_alignParentEnd="true" android:layout_marginEnd="@dimen/dp_36" android:layout_marginBottom="@dimen/dp_20" />
+</RelativeLayout>
